@@ -23,7 +23,7 @@
 
 ## 作者
 
-- AntiO2
+- [AntiO2](https://space.bilibili.com/52596817)
 
 ## 版权
 
