@@ -16,7 +16,6 @@
 // ==/UserScript==
 
 (function (root, factory) {
-    console.log("[BiliTimer]setTheme");
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
         define(['exports', 'echarts'], factory);
@@ -446,7 +445,6 @@
         var BiliTimer = {};// 脚本对象
         BiliTimer.setHTML = function () {
             //var vc = document.getElementsByClassName('.video-container-v1');
-            console.log("[BiliTimer] loadHTML");
             var timer = $("<div class='bili-timer'>\
             <div id='bili-timer-box'>\
             <div id='bili-timer-chart-box'>\
@@ -815,7 +813,6 @@
                     else
                         percent = ((totprev / totTime) * 100).toFixed(2);
                 }
-                console.log($("#bili-timer-num").find(".percentage"));
                 $("#bili-timer-num").find(".percentage").text(percent + '%');
 
             }
