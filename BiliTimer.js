@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Bili-Timer
 // @namespace    AntiO2
-// @version      0.1
+// @version      0.1.1
 // @description  统计视频剩余时间
 // @author       AntiO2
 // @match        https://www.bilibili.com/video/*
