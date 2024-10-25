@@ -663,7 +663,7 @@
             if ($('.cur-list').length == 1) {
                 type = 1;//分p视频
             }
-            if ($('.video-section-list').length == 1) {
+            if ($('.video-pod__list').length == 1) {
                 type = 2;//合集视频
             }
             return type;
@@ -731,9 +731,9 @@
                 }
                 if (type == 2) {
                     let flag = 1;
-                    $(".right-container-inner").find('.video-section-list').children().each(function (index, now) {
-                        var time_now = BiliTimer.getSec($(now).find('.video-episode-card__info-duration').text());
-                        var watched = $(now).find('.video-episode-card__info').prop('class').split(' ').length == 2;
+                    $(".right-container-inner").find('.video-pod__list').children().each(function (index, now) {
+                        var time_now = BiliTimer.getSec($(now).find('.duration').text());
+                        var watched = $(now).prop('class').split(' ').length == 4;
                         if (watched) {//当前正在观看   
                             flag = 0;
 
@@ -782,7 +782,7 @@
                     remainTime = timeobj.remain;
                 });
                 const config = { attributes: true, childList: true, subtree: true };
-                observer.observe($(".right-container-inner").find('.video-section-list')[0], config);
+                observer.observe($(".right-container-inner").find('.video-pod__list')[0], config);
             }
             /**---------------------------------------------------------- */
 
@@ -825,4 +825,3 @@
         BiliTimer.countTime(BiliTimer.checkType());
     });
 })();
-
