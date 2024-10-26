@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Bili-Timer
 // @namespace    AntiO2
-// @version      0.1.1
+// @version      0.1.2
 // @description  统计视频剩余时间
 // @author       AntiO2
 // @match        https://www.bilibili.com/video/*
@@ -733,7 +733,7 @@
                     let flag = 1;
                     $(".right-container-inner").find('.video-pod__list').children().each(function (index, now) {
                         var time_now = BiliTimer.getSec($(now).find('.duration').text());
-                        var watched = $(now).prop('class').split(' ').length == 4;
+                        var watched = typeof($(now).attr('data-scrolled'))!='undefined';
                         if (watched) {//当前正在观看   
                             flag = 0;
 
