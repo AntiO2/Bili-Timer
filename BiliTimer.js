@@ -8,7 +8,7 @@
 // @icon         https://img.moegirl.org.cn/common/f/f5/Bilibili_Icon.svg
 // @grant        unsafeWindow
 // @require      https://code.jquery.com/jquery-3.6.1.min.js
-// @require      https://cdn.staticfile.org/echarts/4.3.0/echarts.min.js
+// @require      https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js
 // @run-at       document-end
 // @homepage     https://github.com/AntiO2
 // @supportURL   https://github.com/AntiO2
