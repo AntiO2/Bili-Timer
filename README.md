@@ -8,7 +8,7 @@
   - 支持[课堂](https://www.bilibili.com/cheese)播放页
 - 支持百分比显示
 - 动态图表。
-- ![image](https://tvax2.sinaimg.cn/large/0073fhLzly1h6lh2pn953j30jr0lcagm.jpg)
+- ![image](./assets/preview.jpeg)
 
 ## 使用方式
 
