@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Bili-Timer
 // @namespace    AntiO2
-// @version      1.0.3
+// @version      1.0.4
 // @description  统计视频剩余时间
 // @author       AntiO2
 // @match        https://www.bilibili.com/video/*
@@ -14,8 +14,8 @@
 // @require      https://code.jquery.com/jquery-3.6.1.min.js
 // @require      https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js
 // @run-at       document-end
-// @homepage     https://github.com/AntiO2
-// @supportURL   https://github.com/AntiO2
+// @homepage     https://github.com/AntiO2/Bili-Timer
+// @supportURL   https://github.com/AntiO2/Bili-Timer/issues
 
 // ==/UserScript==
 
@@ -1061,6 +1061,70 @@
             return isNaN(duration) ? 0 : duration;
         }
 
+        BiliTimer.getCollectionDomTime = function () {
+            var list = $(".right-container-inner").find('.video-pod__list').first();
+            if (!list.length) {
+                return null;
+            }
+
+            var entries = [];
+            var activeIndex = -1;
+
+            list.children('.pod-item').each(function () {
+                var pod = $(this);
+                var pageItems = pod.find('.page-list').first().children('.page-item');
+
+                if (pageItems.length) {
+                    pageItems.each(function () {
+                        var item = $(this);
+                        var duration = BiliTimer.getSec($.trim(item.find('.duration').text()));
+                        duration = isNaN(duration) ? 0 : duration;
+                        entries.push({
+                            duration: duration,
+                            active: item.hasClass('active') || item.find('.playing-gif:visible').length > 0
+                        });
+                    });
+                    return;
+                }
+
+                var singleItem = pod.find('.single-p .simple-base-item').first();
+                if (singleItem.length) {
+                    var singleDuration = BiliTimer.getSec($.trim(singleItem.find('.duration').text()));
+                    singleDuration = isNaN(singleDuration) ? 0 : singleDuration;
+                    entries.push({
+                        duration: singleDuration,
+                        active: pod.attr('data-scrolled') === 'true' || singleItem.hasClass('active') || singleItem.find('.playing-gif:visible').length > 0
+                    });
+                }
+            });
+
+            for (var i = 0; i < entries.length; i++) {
+                if (entries[i].active) {
+                    activeIndex = i;
+                    break;
+                }
+            }
+
+            if (activeIndex < 0 || !entries.length) {
+                return null;
+            }
+
+            var prev = 0;
+            var remain = 0;
+            for (var j = 0; j < entries.length; j++) {
+                if (j < activeIndex) {
+                    prev += entries[j].duration;
+                } else if (j > activeIndex) {
+                    remain += entries[j].duration;
+                }
+            }
+
+            return {
+                prev: prev,
+                remain: remain
+            };
+        }
+
         BiliTimer.getVideoTime = function (type) {
             var timeobj = {
                 prev: 0,
@@ -1089,22 +1153,12 @@
                 });
             }
             if (type == 'collection') {
-                var collectionFlag = 1;
-                $(".right-container-inner").find('.video-pod__list').children().each(function (index, now) {
-                    var time_now = BiliTimer.getSec($(now).find('.duration').text());
-                    var watched = typeof ($(now).attr('data-scrolled')) != 'undefined';
-                    if (watched) {
-                        collectionFlag = 0;
-                    }
-                    else {
-                        if (collectionFlag == 1) {
-                            pr += time_now;
-                        }
-                        else {
-                            re += time_now;
-                        }
-                    }
-                });
+                var collectionTime = BiliTimer.getCollectionDomTime();
+                if (collectionTime) {
+                    timeobj.prev = collectionTime.prev;
+                    timeobj.remain = collectionTime.remain;
+                    return timeobj;
+                }
             }
             timeobj.prev = pr;
             timeobj.remain = re;

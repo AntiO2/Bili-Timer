@@ -23,6 +23,7 @@
 ### 合集 / 列表型视频
 
 - https://www.bilibili.com/video/BV1Kw411b7RJ/
+- https://www.bilibili.com/video/BV1hjr2BpEDF/
 
 ### 番剧
 

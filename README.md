@@ -29,5 +29,5 @@
 ## 版权
 
 - [Apache-2.0 license](https://github.com/AntiO2/Bili-Timer/blob/main/LICENSE)
-- 欢迎debug,提issue
+- [报告 Bug / 提 Issue](https://github.com/AntiO2/Bili-Timer/issues)
 - [AntiO2/Bili-Timer: 一个用于统计Bilibili多视频进度的TamperMonkey插件 (github.com)](https://github.com/AntiO2/Bili-Timer)
