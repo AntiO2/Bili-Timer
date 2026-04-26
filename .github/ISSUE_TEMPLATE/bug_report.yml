@@ -34,7 +34,7 @@ body:
       description: 请描述实际表现、预期表现，以及是否可以稳定复现。
       placeholder: 例如：番剧页面中当前集高亮正常，但已观看时长一直为 0。
     validations:
-      required: true
+      required: false
 
   - type: textarea
     id: repro_steps
@@ -47,7 +47,7 @@ body:
         3. 将鼠标移动到悬浮按钮
         4. 观察到...
     validations:
-      required: true
+      required: false
 
   - type: textarea
     id: environment
@@ -60,7 +60,7 @@ body:
         - Script version:
         - Account state:
     validations:
-      required: true
+      required: false
 
   - type: textarea
     id: screenshots
