@@ -1,0 +1,71 @@
+name: Bug Report
+description: Report a problem with BiliTimer
+title: "[Bug] "
+labels:
+  - bug
+body:
+  - type: dropdown
+    id: issue_type
+    attributes:
+      label: 问题类型
+      description: 请选择最接近的问题类型
+      options:
+        - 统计功能失效
+        - 页面样式/悬浮按钮异常
+        - 图表/百分比显示异常
+        - 兼容性问题
+        - 其他问题
+    validations:
+      required: true
+
+  - type: textarea
+    id: broken_link
+    attributes:
+      label: 失效视频链接
+      description: 如果你选择的是“统计功能失效”，请贴出失效视频或页面的完整链接。
+      placeholder: https://www.bilibili.com/video/... 或 https://www.bilibili.com/bangumi/play/... 或 https://www.bilibili.com/cheese/play/...
+    validations:
+      required: false
+
+  - type: textarea
+    id: bug_description
+    attributes:
+      label: 问题描述
+      description: 请描述实际表现、预期表现，以及是否可以稳定复现。
+      placeholder: 例如：番剧页面中当前集高亮正常，但已观看时长一直为 0。
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro_steps
+    attributes:
+      label: 复现步骤
+      description: 请尽量写清楚复现路径。
+      placeholder: |
+        1. 打开某个视频页面
+        2. 等待播放器和右侧列表加载完成
+        3. 将鼠标移动到悬浮按钮
+        4. 观察到...
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: 环境信息
+      description: 请填写浏览器、Tampermonkey 版本、脚本版本、账号状态（如大会员/已购课程/未购课程）。
+      placeholder: |
+        - Browser:
+        - Tampermonkey:
+        - Script version:
+        - Account state:
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: 截图或补充信息
+      description: 可选。若有控制台报错、页面截图或补充说明，请贴在这里。
+    validations:
+      required: false
