@@ -4,10 +4,12 @@
 
 - 统计视频观看时间
   - 支持单个视频、分p视频、视频合集
+  - 支持嵌套合集（子合集与总合集分别统计进度）
   - 支持[番剧/影视](https://www.bilibili.com/bangumi)播放页
   - 支持[课堂](https://www.bilibili.com/cheese)播放页
 - 支持百分比显示
 - 动态图表。
+- ![嵌套合集效果](./assets/nested.png)
 - ![image](./assets/preview.jpeg)
 
 ## 使用方式

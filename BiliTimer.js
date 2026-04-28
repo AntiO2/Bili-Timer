@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Bili-Timer
 // @namespace    AntiO2
-// @version      1.0.4
+// @version      1.1.0
 // @description  统计视频剩余时间
 // @author       AntiO2
 // @match        https://www.bilibili.com/video/*
@@ -452,6 +452,16 @@
             var timer = $("<div class='bili-timer'>\
             <div id='bili-timer-box'>\
             <div id='bili-timer-chart-box'>\
+            <div id='bili-timer-total-bar'>\
+            <div id='bili-timer-total-bar-tooltip'>\
+            <span id='bili-timer-total-bar-tooltip-watched'></span>\
+            <span id='bili-timer-total-bar-tooltip-remain'></span>\
+            </div>\
+            <div id='bili-timer-total-bar-track'>\
+            <div id='bili-timer-total-bar-fill'></div>\
+            </div>\
+            <div id='bili-timer-total-bar-label'>总合集进度 0%</div>\
+            </div>\
             </div>\
             <div id='bili-timer-text'>视频<br>进度</div>\
             <div id=\"bili-timer-icon\"><svg 'xmlns =\"http://www.w3.org/2000/svg\" width=\"60\" height=\"60\" fill=\"rgb(255,255,255)\" class=\"bi bi-clock-history\" viewBox=\"0 0 40 40\">\
@@ -523,6 +533,57 @@
                 display: 'none',
                 opacity: '0.95'
             });
+            $('#bili-timer-total-bar').css({
+                position: 'absolute',
+                bottom: '12px',
+                left: '10%',
+                width: '80%',
+                zIndex: '3',
+                textAlign: 'center'
+            });
+            $('#bili-timer-total-bar-track').css({
+                width: '100%',
+                height: '4px',
+                backgroundColor: 'rgb(0,174,236)',
+                borderRadius: '2px',
+                overflow: 'hidden'
+            });
+            $('#bili-timer-total-bar-fill').css({
+                height: '100%',
+                width: '0%',
+                backgroundColor: 'rgb(242,93,142)',
+                borderRadius: '2px',
+                transition: 'width 0.5s ease'
+            });
+            $('#bili-timer-total-bar-label').css({
+                fontSize: '11px',
+                color: '#b0b0b0',
+                textAlign: 'center',
+                letterSpacing: '0.5px',
+                marginTop: '6px',
+                cursor: 'default'
+            });
+            $('#bili-timer-total-bar-tooltip').css({
+                position: 'absolute',
+                bottom: '100%',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                marginBottom: '6px',
+                padding: '4px 10px',
+                backgroundColor: 'rgba(0,0,0,0.75)',
+                borderRadius: '4px',
+                fontSize: '11px',
+                color: '#fff',
+                whiteSpace: 'nowrap',
+                display: 'none',
+                pointerEvents: 'none'
+            });
+            $('#bili-timer-total-bar-tooltip-watched').css({
+                color: 'rgb(242,93,142)'
+            });
+            $('#bili-timer-total-bar-tooltip-remain').css({
+                color: 'rgb(0,174,236)'
+            });
             $('#bili-timer-icon').css({
                 position: 'absolute',
                 display: 'none',
@@ -554,6 +615,9 @@
 
         var BiliChart;
         var isEstimated = false;
+        var collectionIsNested = false;
+        var collectionTotalPrev = 0;
+        var collectionTotalRemain = 0;
         /**
          * 设置图标数据
          * @param {*} prev 已观看时长
@@ -621,6 +685,8 @@
 
             $('#bili-timer-chart-box').append(chart);
             $('#bili-timer-chart-box').append(num);
+
+            $('#bili-timer-total-bar').hide();
             var option = {
                 tooltip: {
                     trigger: 'item'
@@ -681,6 +747,13 @@
                     $('#bili-timer-chart-box').stop().fadeOut(300);
                 });
             })();
+            // Total bar tooltip hover (event delegation — bar may not exist yet)
+            $('#bili-timer-chart-box').on('mouseenter', '#bili-timer-total-bar', function () {
+                $('#bili-timer-total-bar-tooltip').stop().fadeIn(150);
+            });
+            $('#bili-timer-chart-box').on('mouseleave', '#bili-timer-total-bar', function () {
+                $('#bili-timer-total-bar-tooltip').stop().fadeOut(100);
+            });
         }
         /**
          * 
@@ -1067,61 +1140,133 @@
                 return null;
             }
 
-            var entries = [];
-            var activeIndex = -1;
+            var pods = [];
+            var activePodIndex = -1;
+            var activeEntryIndex = -1;
 
-            list.children('.pod-item').each(function () {
-                var pod = $(this);
-                var pageItems = pod.find('.page-list').first().children('.page-item');
+            // Handle .pod-item (nested sub-collection structure) or
+            // .video-pod__item (flat item list structure).
+            var podChildren = list.children('.pod-item');
+            var isFlatItems = false;
 
-                if (pageItems.length) {
-                    pageItems.each(function () {
-                        var item = $(this);
-                        var duration = BiliTimer.getSec($.trim(item.find('.duration').text()));
-                        duration = isNaN(duration) ? 0 : duration;
-                        entries.push({
-                            duration: duration,
-                            active: item.hasClass('active') || item.find('.playing-gif:visible').length > 0
-                        });
-                    });
-                    return;
-                }
-
-                var singleItem = pod.find('.single-p .simple-base-item').first();
-                if (singleItem.length) {
-                    var singleDuration = BiliTimer.getSec($.trim(singleItem.find('.duration').text()));
-                    singleDuration = isNaN(singleDuration) ? 0 : singleDuration;
-                    entries.push({
-                        duration: singleDuration,
-                        active: pod.attr('data-scrolled') === 'true' || singleItem.hasClass('active') || singleItem.find('.playing-gif:visible').length > 0
-                    });
-                }
-            });
-
-            for (var i = 0; i < entries.length; i++) {
-                if (entries[i].active) {
-                    activeIndex = i;
-                    break;
-                }
+            if (!podChildren.length) {
+                podChildren = list.children('.video-pod__item');
+                isFlatItems = true;
             }
 
-            if (activeIndex < 0 || !entries.length) {
+            if (isFlatItems) {
+                // Flat list: each .video-pod__item is a single video entry.
+                // Group all into one pod.
+                var flatEntries = [];
+                podChildren.each(function () {
+                    var item = $(this);
+                    var duration = BiliTimer.getSec($.trim(item.find('.duration').text()));
+                    duration = isNaN(duration) ? 0 : duration;
+                    flatEntries.push({
+                        duration: duration,
+                        active: item.is('[data-scrolled]') || item.hasClass('active') || item.find('.playing-gif:visible').length > 0
+                    });
+                });
+                if (flatEntries.length) {
+                    pods.push({ entries: flatEntries });
+                }
+            } else {
+                podChildren.each(function () {
+                    var pod = $(this);
+                    var podEntries = [];
+
+                    var pageItems = pod.find('.page-list').first().children('.page-item');
+                    if (pageItems.length) {
+                        pageItems.each(function () {
+                            var item = $(this);
+                            var duration = BiliTimer.getSec($.trim(item.find('.duration').text()));
+                            duration = isNaN(duration) ? 0 : duration;
+                            podEntries.push({
+                                duration: duration,
+                                active: item.hasClass('active') || item.find('.playing-gif:visible').length > 0
+                            });
+                        });
+                    } else {
+                        var singleItem = pod.find('.single-p .simple-base-item').first();
+                        if (singleItem.length) {
+                            var singleDuration = BiliTimer.getSec($.trim(singleItem.find('.duration').text()));
+                            singleDuration = isNaN(singleDuration) ? 0 : singleDuration;
+                            podEntries.push({
+                                duration: singleDuration,
+                                active: pod.attr('data-scrolled') === 'true' || singleItem.hasClass('active') || singleItem.find('.playing-gif:visible').length > 0
+                            });
+                        }
+                    }
+
+                    if (podEntries.length) {
+                        pods.push({ entries: podEntries });
+                    }
+                });
+            }
+
+            // Find active entry across all pods
+            for (var p = 0; p < pods.length; p++) {
+                for (var e = 0; e < pods[p].entries.length; e++) {
+                    if (pods[p].entries[e].active) {
+                        activePodIndex = p;
+                        activeEntryIndex = e;
+                        break;
+                    }
+                }
+                if (activePodIndex >= 0) break;
+            }
+
+            if (activePodIndex < 0 || !pods.length) {
                 return null;
             }
 
-            var prev = 0;
-            var remain = 0;
-            for (var j = 0; j < entries.length; j++) {
-                if (j < activeIndex) {
-                    prev += entries[j].duration;
-                } else if (j > activeIndex) {
-                    remain += entries[j].duration;
+            // Nested: 2+ pods exist AND at least one pod is a sub-collection (3+ entries),
+            // not just individual multi-part videos.
+            var isNested = pods.length > 1 && pods.some(function (p) {
+                return p.entries.length >= 3;
+            });
+
+            // Sub-collection (current pod) times — for ring chart
+            var subPrev = 0;
+            var subRemain = 0;
+            var activePod = pods[activePodIndex];
+            for (var j = 0; j < activePod.entries.length; j++) {
+                if (j < activeEntryIndex) {
+                    subPrev += activePod.entries[j].duration;
+                } else if (j > activeEntryIndex) {
+                    subRemain += activePod.entries[j].duration;
                 }
             }
 
+            // Total collection times — for progress bar
+            var totalPrev = 0;
+            var totalRemain = 0;
+            var globalActiveFound = false;
+            for (var k = 0; k < pods.length; k++) {
+                for (var m = 0; m < pods[k].entries.length; m++) {
+                    if (k === activePodIndex && m === activeEntryIndex) {
+                        globalActiveFound = true;
+                        continue;
+                    }
+                    if (!globalActiveFound) {
+                        totalPrev += pods[k].entries[m].duration;
+                    } else {
+                        totalRemain += pods[k].entries[m].duration;
+                    }
+                }
+            }
+
+            if (!isNested) {
+                subPrev = totalPrev;
+                subRemain = totalRemain;
+            }
+
             return {
-                prev: prev,
-                remain: remain
+                prev: subPrev,
+                remain: subRemain,
+                isNested: isNested,
+                totalPrev: totalPrev,
+                totalRemain: totalRemain
             };
         }
 
@@ -1157,6 +1302,9 @@
                 if (collectionTime) {
                     timeobj.prev = collectionTime.prev;
                     timeobj.remain = collectionTime.remain;
+                    collectionIsNested = collectionTime.isNested || false;
+                    collectionTotalPrev = collectionTime.totalPrev || 0;
+                    collectionTotalRemain = collectionTime.totalRemain || 0;
                     return timeobj;
                 }
             }
@@ -1343,6 +1491,29 @@
                     percent = ((totprev / totTime) * 100).toFixed(2);
                 }
                 $("#bili-timer-num").find(".percentage").text(percent + '%');
+
+                if (collectionIsNested) {
+                    var totalTotPrev = collectionTotalPrev + pastTime;
+                    var totalTotRemain = Math.max(0, collectionTotalRemain + nowlength - pastTime);
+                    var totalTotTime = totalTotPrev + totalTotRemain;
+                    var totalPercent;
+                    if (totalTotTime <= 0) {
+                        totalPercent = 0;
+                    } else if (totalTotPrev >= totalTotTime) {
+                        totalPercent = 100;
+                    } else {
+                        totalPercent = ((totalTotPrev / totalTotTime) * 100).toFixed(2);
+                    }
+                    $('#bili-timer-num').find('.tip').text('子合集进度');
+                    $('#bili-timer-total-bar-fill').css('width', totalPercent + '%');
+                    $('#bili-timer-total-bar-label').text('总合集进度 ' + totalPercent + '%');
+                    $('#bili-timer-total-bar-tooltip-watched').text('已观看 ' + BiliTimer.getFormat(totalTotPrev));
+                    $('#bili-timer-total-bar-tooltip-remain').text('  剩余 ' + BiliTimer.getFormat(totalTotRemain));
+                    $('#bili-timer-total-bar').css('display', 'block');
+                } else {
+                    $('#bili-timer-num').find('.tip').text('观看总进度');
+                    $('#bili-timer-total-bar').css('display', 'none');
+                }
             }
 
             if (type == 'cheese' && allowRenderWithoutPlayer) {
