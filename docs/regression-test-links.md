@@ -18,12 +18,17 @@
 
 ### 分 P 视频
 
-- https://www.bilibili.com/video/BV1ErP9eJE92/
+- https://www.bilibili.com/video/BV12E4113759/
+- https://www.bilibili.com/video/BV1yX4y167YH/
 
 ### 合集 / 列表型视频
 
 - https://www.bilibili.com/video/BV1Kw411b7RJ/
-- https://www.bilibili.com/video/BV1hjr2BpEDF/
+
+### 嵌套合集（子合集）
+
+- https://www.bilibili.com/video/BV12Vz5B7EE1/
+  - 验证点：环状图显示当前子合集进度，底部进度条显示总合集进度，悬浮可查看具体时间
 
 ### 番剧
 
