@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1 - 2026-05-02
+
+- Optimized userscript metadata for SEO: expanded `@name`, `@description`, and added `@license` field.
+
 ## 1.1.0 - 2026-04-29
 
 - Added nested sub-collection progress tracking: ring chart shows current sub-collection progress, bottom bar shows total collection progress ([#7](https://github.com/AntiO2/Bili-Timer/issues/7)).
