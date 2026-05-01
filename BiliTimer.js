@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Bili-Timer
+// @name         B站视频/合集观看进度统计（支持番剧/课堂/嵌套合集）- BiliTimer
 // @namespace    AntiO2
-// @version      1.1.0
-// @description  统计视频剩余时间
+// @version      1.1.1
+// @description  统计 Bilibili 视频、合集、番剧观看进度，支持多P、嵌套合集与百分比显示
 // @author       AntiO2
 // @match        https://www.bilibili.com/video/*
 // @match        https://www.bilibili.com/bangumi/play/*
@@ -16,6 +16,7 @@
 // @run-at       document-end
 // @homepage     https://github.com/AntiO2/Bili-Timer
 // @supportURL   https://github.com/AntiO2/Bili-Timer/issues
+// @license      Apache-2.0
 
 // ==/UserScript==
 
